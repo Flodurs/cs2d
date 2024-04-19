@@ -15,13 +15,17 @@ class framework:
                
         self.w = world.world()
         
-        pathB ="D:/Dev/cs2d/fighting/nets/gen4_1395_pol647.npy"
-        # #pathB = pathA
-        pathA = "D:/Dev/cs2d/fighting/nets/gen4_1395_pol647.npy"
+        # pathB ="D:/Dev/cs2d/fighting/nets/gen4_1395_pol647.npy"
+        # # #pathB = pathA
+        # pathA = "D:/Dev/cs2d/fighting/nets/gen4_1395_pol647.npy"
         
         # pathB ="D:/Dev/cs2d/fighting/netsStrict/gen28.npy"
         # # #pathB = pathA
         # pathA = "D:/Dev/cs2d/fighting/netsStrict/gen28.npy"
+        
+        pathB ="D:/Dev/cs2d/cs2d/fxnets/gen10.npy"
+        # # #pathB = pathA
+        pathA = "D:/Dev/cs2d/cs2d/fxnets/gen10.npy"
         
         self.matrixA = np.load(pathA,allow_pickle=False)
         self.matrixB = np.load(pathB,allow_pickle=False)

@@ -95,7 +95,7 @@ class world:
         
         
         
-         #0: netA win; 1: netB won
+         #0: netA won; 1: netB won
         
     
         

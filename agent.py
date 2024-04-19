@@ -310,7 +310,7 @@ class agent:
                 self.shotRange = rayCastResult[1] 
             
             if rayCastResult[0]==1:
-                print("hit")
+                #print("hit")
                 rayCastResult[2].hit()
         
     def updateWeapon(self,deltaT):

@@ -11,6 +11,9 @@ class policy:
         self.rating = 1200
         self.matchesPlayed = 0
         
+        self.score = 0
+        
+        
     def matchPlayed(self,opponentRating,score):
         self.matchesPlayed+=1
         Erwartungswert = 1/(1+10**((opponentRating-self.rating)/400))
@@ -49,6 +52,16 @@ class policy:
         
     def loadFromFile(self,path):
         pass
+        
+    def setScore(self,s):
+        self.score = s
+        
+    def getScore(self):
+        return self.score
+        
+    def addScore(self,s):
+        self.score += s
+    
         
         
         
