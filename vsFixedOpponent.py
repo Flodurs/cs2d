@@ -1,6 +1,7 @@
 import numpy as np
 import world
 import policy
+import multiprocessing
 
 
 class fixedOppTrainer:
@@ -9,11 +10,11 @@ class fixedOppTrainer:
         self.oppPols = []
         self.policys = []
         
-        self.truncationRatio = 0.5
-        self.polNum = 20
+        self.truncationRatio = 0.35
+        self.polNum = 100
         self.oppNum = 1
-        self.mutationValue= 0.005
-        self.evalRunsNum = 10
+        self.mutationValue= 0.01
+        self.evalRunsNum = 20
         
         self.generation=0
         
@@ -26,7 +27,7 @@ class fixedOppTrainer:
     
     def update(self):
         #evaluate 
-        self.evaluatePols()
+        self.parallelEvalPols()
         
         
         #selectAndMutate
@@ -37,10 +38,12 @@ class fixedOppTrainer:
             pol.setScore(0)
         self.generation+=1    
             
-         
+        if self.generation%10 == 0:
+            self.copyPol(self.oppPols[0],self.getPolSortedByScore()[-1])
         
         
     def evaluatePols(self):
+       
         for i in range(self.evalRunsNum):
             for pol in self.policys:
                 for opp in self.oppPols:
@@ -56,9 +59,23 @@ class fixedOppTrainer:
                     if result == 1:
                         pol.addScore(1)
                    
-                    
-                    
-                    
+    def parallelEvalPols(self):
+        pool = multiprocessing.Pool(20)
+        w = world.world()
+        
+        for pol in self.policys:
+            for opp in self.oppPols:
+                processes = [pool.apply_async(w.playMatch, args=[pol.getMatrix(),opp.getMatrix()]) for i in range(self.evalRunsNum)]
+                results = [p.get() for p in processes]
+                
+                pol.addScore(sum([1 for r in results if r == 0]))
+                
+
+                processes = [pool.apply_async(w.playMatch, args=[opp.getMatrix(),pol.getMatrix()]) for i in range(self.evalRunsNum)]
+                results = [p.get() for p in processes]
+               
+                pol.addScore(sum([1 for r in results if r == 1]))                
+                
         
         
     def selectAndMutate(self):
@@ -100,10 +117,10 @@ class fixedOppTrainer:
         polDest.setMatrix(polSrc.getMatrix())
         polDest.setRating(polSrc.getRating())
         
-        
-fx = fixedOppTrainer()
-for i in range(100):
-    fx.update()
+if __name__ == "__main__":  
+    fx = fixedOppTrainer()
+    for i in range(100):
+        fx.update()
         
     
     

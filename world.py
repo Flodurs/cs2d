@@ -4,7 +4,7 @@ import agent
 import numpy as np
 import darwin
 import random
-import zeichner
+#import zeichner
 import time
 
 class world:
@@ -54,6 +54,7 @@ class world:
     def updateAgents(self):
         for ind,ag in enumerate(self.agents):
             ag.update(self,self.deltaT)
+           
             if ag.getHp() <= 0:
                 return ind
         
@@ -72,11 +73,11 @@ class world:
         self.agents.append(agent)
         
     def playMatch(self,matrixA,matrixB):
-        self.agents = [agent.agent(np.array([400+random.randrange(-100,100),800.0]),np.pi,matrixA.shape[0]),agent.agent(np.array([400+random.randrange(-100,100),0.0]),0,matrixB.shape[0])]
+        self.agents = [agent.agent(np.array([400+random.randrange(-100,100),800.0]),random.uniform(0, np.pi*2),matrixA.shape[0]),agent.agent(np.array([400+random.randrange(-100,100),0.0]),random.uniform(0, np.pi*2),matrixB.shape[0])]
         self.agents[0].setConnectionMatrix(matrixA)
         self.agents[1].setConnectionMatrix(matrixB)
         
-        for i in range(400):
+        for i in range(300):
             dead = self.update()
           
             if dead == 1:

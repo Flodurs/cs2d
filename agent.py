@@ -57,8 +57,11 @@ class agent:
         self.updateViewList(world)
         self.updateWeapon(deltaTime)
         self.shotFlag = 0
-        self.shoot(world)
+        
         self.think(world)
+        
+       
+
         
         self.pos += self.vel*deltaTime*200
         if self.pos[0] < 10:
@@ -71,7 +74,9 @@ class agent:
             self.pos[1] = 790
         
         
-        self.rotation+=self.angularVel
+        #self.vel=np.clip(self.vel,-2,2)
+        
+        self.rotation+=self.angularVel*deltaTime*10
         if self.handleCollision(world) == True:
             self.pos -= self.vel*deltaTime*200
             
@@ -218,6 +223,7 @@ class agent:
     def think(self,world):
         #self.brain.reset()
         processedInputs = self.processInputs(self.viewList)
+        #print(processedInputs)
         #self.brain.reset()
         #print(processedInputs)
         for i in range(len(processedInputs)):
@@ -242,7 +248,8 @@ class agent:
         for inp in inputs:
             processedInputs.append(inp[0]/self.viewRange)
             processedInputs.append(inp[1])
-            processedInputs.append(math.fmod(self.rotation,2*math.pi))
+        
+        processedInputs.append(math.fmod(self.rotation,2*math.pi))
         processedInputs.append(1.0)
         return processedInputs
         
@@ -264,8 +271,11 @@ class agent:
             #print("right")
             acc += np.array([1.0,0.0])
             
+        #print(acc)
+            # print(self.rotation)
+            
         self.vel+=np.matmul(np.array([[math.cos(self.rotation),math.sin(self.rotation)],[-math.sin(self.rotation),math.cos(self.rotation)]]),acc)
-        self.vel=np.clip(self.vel,-2,2)
+        self.vel = self.normalize(self.vel)
         
         rotAcc = 0
             
@@ -297,7 +307,7 @@ class agent:
         return self.hp
             
     def shoot(self,world):
-        if self.weaponTimer > 0.5 and np.linalg.norm(self.vel):
+        if self.weaponTimer > 0.5:
             self.shotFlag = 1
             self.weaponTimer = 0
             self.shotPos = self.pos
@@ -316,3 +326,8 @@ class agent:
     def updateWeapon(self,deltaT):
         self.weaponTimer += deltaT 
         
+    def normalize(self,v):
+        norm = np.linalg.norm(v)
+        if norm == 0: 
+            return v
+        return v / norm
