@@ -17,8 +17,8 @@ class agent:
         self.initPos = np.array([1020,600])
         
         #view
-        self.viewRayNum = 5
-        self.viewRayAngles = [-0.1,-0.5,0,0.5,0.1] 
+        self.viewRayNum = 3
+        self.viewRayAngles = [-0.3,0,0.3] 
         self.viewList = np.zeros((self.viewRayNum,2))
         self.viewRange = 800
         
@@ -231,12 +231,12 @@ class agent:
             
         
             
-        for i in range(6):
+        for i in range(2):
             self.brain.step()
         
         outputs = []
         for i in range(7):
-            outputs.append(self.brain.getNode(i+20))
+            outputs.append(self.brain.getNode(-i-1))
         
         self.actFromOutputs(outputs,world)
            
@@ -246,11 +246,22 @@ class agent:
     def processInputs(self,inputs):
         processedInputs = []
         for inp in inputs:
-            processedInputs.append(inp[0]/self.viewRange)
+            processedInputs.append(inp[0]/self.viewRange+1)
             processedInputs.append(inp[1])
-        
-        processedInputs.append(math.fmod(self.rotation,2*math.pi))
+            
+            
+        if self.rotation >= 0:
+            processedInputs.append(math.fmod(self.rotation,2*math.pi))
+        if self.rotation < 0:
+            processedInputs.append(-math.fmod(self.rotation,2*math.pi))
+            
+        processedInputs.append(np.linalg.norm(self.pos-np.array([400,400]))/600)
+         
         processedInputs.append(1.0)
+        
+        
+        
+        #print(processedInputs)
         return processedInputs
         
     def actFromOutputs(self,outputs,world):

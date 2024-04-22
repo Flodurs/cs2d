@@ -10,7 +10,9 @@ class net:
         
     def step(self):
         
-        self.nodes = np.tanh(np.matmul(self.connectionMatrix, self.nodes))
+        #self.nodes = np.tanh(np.matmul(self.connectionMatrix, self.nodes))
+        self.nodes = self.ReLU(np.matmul(self.connectionMatrix, self.nodes))
+        #rint(self.nodes)
 
     def setConnectionMatrix(self, matrix):
         self.connectionMatrix = matrix
@@ -25,4 +27,6 @@ class net:
         self.nodes = np.zeros(self.nodeNum)
         
     def ReLU(self,x):
-        return (abs(x) + x) / 2
+        
+        return np.clip((abs(x) + x) / 2,0,10)
+       

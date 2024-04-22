@@ -10,11 +10,12 @@ class fixedOppTrainer:
         self.oppPols = []
         self.policys = []
         
-        self.truncationRatio = 0.35
-        self.polNum = 100
+        self.truncationRatio = 0.5
+        self.polNum = 400
         self.oppNum = 1
-        self.mutationValue= 0.01
-        self.evalRunsNum = 20
+        self.mutationValue= 0.007
+        self.evalRunsNum = 5
+        self.nodeNum = 30
         
         self.generation=0
         
@@ -39,7 +40,11 @@ class fixedOppTrainer:
         self.generation+=1    
             
         if self.generation%10 == 0:
-            self.copyPol(self.oppPols[0],self.getPolSortedByScore()[-1])
+            self.oppNum+=1
+            self.oppPols.append(self.getRandomPolicy())
+            self.copyPol(self.oppPols[-1],self.getPolSortedByScore()[-1])
+        if self.oppNum > 5:
+            self.oppPols.pop(0)
         
         
     def evaluatePols(self):
@@ -64,16 +69,12 @@ class fixedOppTrainer:
         w = world.world()
         
         for pol in self.policys:
-            for opp in self.oppPols:
-                processes = [pool.apply_async(w.playMatch, args=[pol.getMatrix(),opp.getMatrix()]) for i in range(self.evalRunsNum)]
+            for i in range(self.evalRunsNum):
+                processes = [pool.apply_async(w.playMatch, args=[pol.getMatrix(),opp.getMatrix()]) for opp in self.oppPols]
                 results = [p.get() for p in processes]
-                
                 pol.addScore(sum([1 for r in results if r == 0]))
-                
-
-                processes = [pool.apply_async(w.playMatch, args=[opp.getMatrix(),pol.getMatrix()]) for i in range(self.evalRunsNum)]
+                processes = [pool.apply_async(w.playMatch, args=[opp.getMatrix(),pol.getMatrix()]) for opp in self.oppPols]
                 results = [p.get() for p in processes]
-               
                 pol.addScore(sum([1 for r in results if r == 1]))                
                 
         
@@ -104,7 +105,7 @@ class fixedOppTrainer:
         
     def getRandomPolicy(self):
         pol = policy.policy(len(self.policys))
-        pol.randomizeMatrix(60)
+        pol.randomizeMatrix(self.nodeNum)
         return pol
         
     def printInfo(self):
@@ -119,7 +120,7 @@ class fixedOppTrainer:
         
 if __name__ == "__main__":  
     fx = fixedOppTrainer()
-    for i in range(100):
+    for i in range(1000):
         fx.update()
         
     

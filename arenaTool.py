@@ -7,6 +7,8 @@ import world
 import agent
 import time
 import random
+import sys
+
 
 class framework:
     def __init__(self):
@@ -24,9 +26,11 @@ class framework:
         # # #pathB = pathA
         # pathA = "D:/Dev/cs2d/fighting/netsStrict/gen28.npy"
         
-        pathB ="D:/Dev/cs2d/cs2d/fxnets/gen12.npy"
+        
+        pathA = "D:/Dev/cs2d/cs2d/fxnets/gen31.npy"
+        pathB ="D:/Dev/cs2d/cs2d/fxnets/gen31.npy"
         # # #pathB = pathA
-        pathA = "D:/Dev/cs2d/cs2d/fxnets/gen0.npy"
+        
         
         self.matrixA = np.load(pathA,allow_pickle=False)
         self.matrixB = np.load(pathB,allow_pickle=False)
@@ -42,6 +46,8 @@ class framework:
         pygame.init()
         self.frame = 0
         
+        self.sleepTime = 0.02
+        
     def run(self):
         while self.bRunning == True:
             for event in pygame.event.get():
@@ -51,7 +57,7 @@ class framework:
             
             self.update()
             self.render()
-            time.sleep(0.02)
+            time.sleep(self.sleepTime)
             if self.frame == 300:
                 self.bRunning = False
                 distA = np.linalg.norm(self.w.getAgents()[0].getPos()-np.array([400,400]))
@@ -61,8 +67,10 @@ class framework:
         
                 if distA < distB:
                     print("A Won")
+                    
                 else:
                     print("B won")
+                   
             self.frame+=1
             #print(self.frame)
             
@@ -70,21 +78,45 @@ class framework:
         if self.w.update() != -1:
             time.sleep(3)
             self.bRunning = False
-        print("----------")    
+        #print("----------")    
             
        
-        
-        
-        # for world in self.worlds:
-            # world.update()
+    def getWinrate(self): 
+        scoreA = 0
+        scoreB = 0
+        for i in range(100):
+            w = world.world()
             
-            
+            res = w.playMatch(self.matrixA,self.matrixB)
+            if res == 0:
+                scoreA+=1
+            else: 
+                scoreB+=1
+                
+                
+            res = w.playMatch(self.matrixB,self.matrixA)
+            if res == 1:
+                scoreA+=1
+            else: 
+                scoreB+=1
+                
+        print("Score A: " + str(scoreA))
+        print("Score B: " + str(scoreB))
+        print("Winrate A: " + str(scoreA/(scoreA+scoreB)))
+        print("Winrate B: " + str(scoreB/(scoreA+scoreB)))
         
     def render(self):
         self.renderer.render(self.w)
-        
-f = framework()
-f.run()
+
+
+
+if sys.argv[1] == "v":
+    f = framework()
+    f.run()
+    
+if sys.argv[1] == "e":
+    f = framework()
+    f.getWinrate()   
 
 
 
